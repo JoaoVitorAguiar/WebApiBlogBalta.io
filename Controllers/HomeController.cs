@@ -8,7 +8,6 @@ namespace Blog.Controllers
     public class HomeController : ControllerBase
     {
         [HttpGet("")]
-        [ApiKey]
         public ActionResult Get() => Ok(); //Health Check
     }
 }
