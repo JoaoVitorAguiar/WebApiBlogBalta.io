@@ -130,7 +130,7 @@ public class AccountController : ControllerBase
             .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
         if (user == null)
-            return NotFound(new ResultViewModel<Category>("Usuário não encontrado"));
+            return NotFound(new ResultViewModel<string>("Usuário não encontrado"));
 
         user.Image = $"https://localhost:0000/images/{fileName}";
         try
