@@ -3,6 +3,7 @@ using Blog.Data;
 using Blog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
@@ -17,14 +18,27 @@ ConfigureAuthentication(builder);
 ConfigureMvc(builder);
 ConfigureServices(builder);
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+// Responsável por gerar o código da interface do swagger
+builder.Services.AddSwaggerGen(); 
+
+
 var app = builder.Build();
 LoadConfiguration(app);
-
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseResponseCompression();
 app.MapControllers();
 app.UseStaticFiles();
+
+if (app.Environment.IsDevelopment())
+{
+    // Se a Api estiver em desenvolvimento, use o swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.Run();
 
@@ -93,7 +107,11 @@ void ConfigureMvc(WebApplicationBuilder builder)
 
 void ConfigureServices(WebApplicationBuilder builder)
 {
-    builder.Services.AddDbContext<BlogDataContext>();
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<BlogDataContext>(options =>
+    {
+        options.UseSqlServer(connectionString);
+    });
     builder.Services.AddTransient<TokenService>();
     builder.Services.AddTransient<EmailService>();
 }
